@@ -19,14 +19,16 @@ let conectado = false
 // método para conectar com o banco de dados
 const conectar = async () => {
     // se não estiver conectado
-    if(!conectado) {
+    if (!conectado) {
         // conectar com o banco de dados
         try {
             await mongoose.connect(url) // conectar
             conectado = true // setar a variável
             console.log("MongoDB Conectado")
+            return true
         } catch (error) {
             console.log(error)
+            return false
         }
     }
 }
@@ -34,17 +36,19 @@ const conectar = async () => {
 // método para desconectar do banco de dados
 const desconectar = async () => {
     // se estiver conectado
-    if(conectado) {
+    if (conectado) {
         // desconectar
         try {
             await mongoose.disconnect(url) // desconectar
             conectado = false // setar a variável
             console.log("MongoDB Desconectado")
+            return true
         } catch (error) {
             console.log(error)
+            return false
         }
     }
 }
 
 // exportar para o main os métodos conectar e desconectar
-module.exports = {conectar, desconectar}
+module.exports = { conectar, desconectar }

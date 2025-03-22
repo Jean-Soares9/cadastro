@@ -24,8 +24,8 @@ api.dbStatus((event, message) => {
     // Teste de recebimento da mensagem
     console.log(message)
     if (message === "conectar") {
-        document.getElementById('icon').src="../public/img/dbon.png"
+        document.getElementById('icon').src = "../public/img/dbon.png"
     } else {
-        document.getElementById('icon').src="../public/img/dboff.png"
+        document.getElementById('icon').src = "../public/img/dboff.png"
     }
 })
