@@ -56,11 +56,23 @@ function aboutWindow() {
             resizable: false,
             minimizable: false,
             parent: main,
-            modal: true
+            modal: true,
+            webPreferences: {
+                preload: path.join(__dirname, 'preload.js')
+              }
         })
     }
     //carregar o documento html na janela
     about.loadFile('./src/views/sobre.html')
+
+    // Recebimento da mensagem do renderizador da tela sobre para fechar a janela usando o botão ok
+    ipcMain.on('about-exit', () => {
+        // Validação (se existir a janela e ela não estiver destruída, fechar)
+        if (about && !about.isDestroyed()) {
+            about.close()
+        }
+
+    })
 }
 
 // Janela cliente
@@ -324,7 +336,7 @@ async function relatorioClientes() {
         for (let i = 1; i <= pages; i++) {
             doc.setPage(i)
             doc.setFontSize(10)
-            doc.text(`Página ${i} de ${pages}`, 105, 290, {align: 'center'})
+            doc.text(`Página ${i} de ${pages}`, 105, 290, { align: 'center' })
         }
 
         // ================================================
