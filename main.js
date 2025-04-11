@@ -356,3 +356,31 @@ async function relatorioClientes() {
 }
 // == Fim - relatório de clientes =============================
 // ============================================================
+
+
+// ============================================================
+// == CRUD READ ===============================================
+
+
+ipcMain.on('search-name', async (event, cliName) => {
+    // Tesye de recebimento do nome do cliente (passo 2)
+    console.log(cliName)
+    try {
+        // Passos 3 e 4 (busca dos dados do cliente pelo nome)
+        // RegExp (expressão regular 'i' -> insensitive (ignorar letras maiúsculas ou minúsculas))
+        const client = await clientModel.find({
+            nomeCliente: new RegExp(cliName, 'i')
+        })
+        // teste da busca do cliente pelo nome (passos 3 e 4)
+        console.log(client)
+        // Enviar ao renderizador (renderClient) os dados do cliente (passo 5) OBS: Não esquecer de converter para string
+        event.reply('render-client', JSON.stringify(client))
+
+    } catch (error) {
+        console.log(error)
+    }
+})
+
+
+// == Fim - CRUD READ =========================================
+// ============================================================
