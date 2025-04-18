@@ -14,7 +14,14 @@ const clienteSchema = new Schema({
     cpfCliente: {
         type: String,
         unique: true,
-        index: true
+        index: true,
+        validate: {
+            validator: function(v) {
+                return /^\d{11}$/.test(v);
+            },
+            message: props => `${props.value} não é um CPF válido!`
+        }
+    
     },
     emailCliente: {
         type: String

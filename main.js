@@ -59,7 +59,7 @@ function aboutWindow() {
             modal: true,
             webPreferences: {
                 preload: path.join(__dirname, 'preload.js')
-              }
+            }
         })
     }
     //carregar o documento html na janela
@@ -213,12 +213,16 @@ ipcMain.on('client-window', () => {
 ipcMain.on('new-client', async (event, client) => {
     // Importante! Teste de recebimento dos dados do cliente
     console.log(client)
+
+    // Antes de salvar, normalizar o CPF (remover pontos, traços e qualquer caractere não numérico)
+    const cpfCli = client.cpfCli.replace(/\D/g, ''); // remove tudo que não for número
+
     // Cadastrar a estrutura de dados no banco de dados MongoDB
     try {
         // criar uma nova de estrutura de dados usando a classe modelo. Atenção! Os atributos precisam ser idênticos ao modelo de dados Clientes.js e os valores são definidos pelo conteúdo do objeto cliente
         const newClient = new clientModel({
             nomeCliente: client.nameCli,
-            cpfCliente: client.cpfCli,
+            cpfCliente: cpfCli,
             emailCliente: client.emailCli,
             foneCliente: client.phoneCli,
             cepCliente: client.cepCli,
@@ -361,21 +365,72 @@ async function relatorioClientes() {
 // ============================================================
 // == CRUD READ ===============================================
 
+// Validação da busca
+ipcMain.on('validate-search', () => {
+    dialog.showMessageBox({
+        type: 'warning',
+        title: 'Atenção',
+        message: 'Preencha o campo busca',
+        buttons: ['OK']
+    })
+})
 
 ipcMain.on('search-name', async (event, cliName) => {
     // Tesye de recebimento do nome do cliente (passo 2)
     console.log(cliName)
     try {
+
+        // 🔎 Verifica se o termo é um CPF (11 dígitos numéricos)
+        const isCpf = /^\d{11}$/.test(cliName.replace(/\D/g, ''));
+        let client;
+
+        if (isCpf) {
+            client = await clientModel.find({ cpfCliente: cliName });
+        } else {
         // Passos 3 e 4 (busca dos dados do cliente pelo nome)
         // RegExp (expressão regular 'i' -> insensitive (ignorar letras maiúsculas ou minúsculas))
-        const client = await clientModel.find({
-            nomeCliente: new RegExp(cliName, 'i')
-        })
+            client = await clientModel.find({
+                nomeCliente: new RegExp(cliName, 'i')
+            });
+        }
+        
+        
         // teste da busca do cliente pelo nome (passos 3 e 4)
         console.log(client)
-        // Enviar ao renderizador (renderClient) os dados do cliente (passo 5) OBS: Não esquecer de converter para string
-        event.reply('render-client', JSON.stringify(client))
+        // Melhoria da experiencia do usuário (se não existir um cliente cadastrado, enviar uma mensagem ao usuário questionando se ele deseja cadastrar este novo cliente)
+        // se o vetor estiver vazio (lenght retorna o tamanho do vetor)
+        if (client.length === 0) {
+            // Questionar o usuário...
+            dialog.showMessageBox({
+                type: 'warning',
+                title: 'Aviso',
+                message: 'Cliente não cadastrado.\nDeseja cadastrar este cliente?',
+                defaultId: 0,
+                buttons: ['Sim', 'Não'] //[0, 1] defaultId: 0 = Sim
+            }).then((result) => {
+                // Seo botão Sim for pressionado
+                if (result.response === 0) {
+                    // Envir ao rendererCliente um pedido para recortar e copiar o nome do cliente do campo de busca para o campo nome (evitar que o usuário digite o nome novamente)
+                    event.reply('set-name')                    
+                } else {
+                  // Enviar ao rendererCliente.js um pedido para limpar os campos (reutilizar a api do preload 'reset-form')
+                event.reply('reset-form')  
+                }
 
+                // Seo botão Sim for pressionado
+                if (result.response === 0) {
+                    // Envir ao rendererCliente um pedido para recortar e copiar o cpf do cliente do campo de busca para o campo cpf (evitar que o usuário digite o cpf novamente)
+                    event.reply('set-cpf')                    
+                } else {
+                  // Enviar ao rendererCliente.js um pedido para limpar os campos (reutilizar a api do preload 'reset-form')
+                event.reply('reset-form')  
+                }
+            })
+        } else {
+            // Enviar ao renderizador (renderClient) os dados do cliente (passo 5) OBS: Não esquecer de converter para string
+        event.reply('render-client', JSON.stringify(client))
+        }
+        
     } catch (error) {
         console.log(error)
     }

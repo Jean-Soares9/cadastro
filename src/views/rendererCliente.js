@@ -83,12 +83,51 @@ frmClient.addEventListener('submit', async (event) => {
 // ============================================================
 // == CRUD READ ===============================================
 
+// Setar o nome do cliente para fazer um novo cadastro, se a busca retornar que o cliente não está cadastrado.
+api.setName((args) => {
+    console.log("Teste do IPC 'set-name'")
+    // "Recortar" o nome da busca e setar no campo do form
+    let busca = document.getElementById('searchClient').value
+    // Limpar o campo de busca 
+    foco.value=""
+    // Foco no campo nome
+    nameClient.focus()
+    // Copiar o nome do cliente para o campo nome
+    nameClient.value = busca
+})
+
+api.setCpf((args) => {
+    console.log("Teste do IPC 'set-cpf'")
+    // "Recortar" o nome da busca e setar no campo do form
+    let buscacpf = document.getElementById('inputCPFClien').value
+    let busca = document.getElementById('searchClient').value
+
+    if (buscacpf && busca) {
+        buscacpf.value = inputCPFClien;
+        busca.value = '';
+        buscacpg.focus();
+    }
+    // Limpar o campo de busca 
+    //foco.value=""
+    // Foco no campo cpf
+    //cpfClient.focus()
+    // Copiar o nome do cliente para o campo nome
+    //cpfClient.value = buscacpf
+})
+
 function searchName() {
     // console.log("Teste do botão buscar")
     // Capturar o nome a ser pesquisado(passo 1)
     let cliName = document.getElementById('searchClient').value
     console.log(cliName) // teste do passo 1
-    // Envair o nome do clinte ao main (passo 2)
+    //validação de campo obrigatorio
+    //se o campo de busca não foi prenchimento
+    if (cliName === "") {
+        //enviar ao maiin um pedido para aletar o usuario
+        //precisa usar o preload.js
+        api.validateSearch()
+    } else {
+         // Envair o nome do clinte ao main (passo 2)
     api.searchName(cliName)
     // Receber os dados do cliente (passo 5)
     api.renderClient((event, client) => {
@@ -113,6 +152,8 @@ function searchName() {
             ufClient.value = c.ufCliente
         })
     })
+    }
+   
 
 }
 
