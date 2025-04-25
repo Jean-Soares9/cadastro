@@ -49,6 +49,30 @@ let neighborhoodClient = document.getElementById('inputNeighborhoodClient')
 let cityClient = document.getElementById('inputCityClient')
 let ufClient = document.getElementById('inputUFClient')
 
+
+
+// ================================================================
+// == Manipulação do Enter ========================================
+function teclaEnter(event) {
+    if (event.key === "Enter") {
+        event.preventDefault() // ignorar o comportamento padrão
+        // executar o método de busca do cliente
+        searchName()
+    }
+}
+
+// "Escuta" do teclado ('keydown' = pressiona tecla)
+frmClient.addEventListener('keydown', teclaEnter)
+
+// função para restaurar o padrão (tecla Enter)
+function restaurarEnter() {
+    frmClient.removeEventListener('keydown', teclaEnter)
+}
+
+
+// ================================================================
+// ================================================================
+
 // ============================================================
 // == CRUD Create/Update ======================================
 
@@ -71,6 +95,7 @@ frmClient.addEventListener('submit', async (event) => {
         neighborhoodCli: neighborhoodClient.value,
         cityCli: cityClient.value,
         ufCli: ufClient.value
+
     }
     // Enviar ao main o objeto client - (Passo 2: fluxo)
     // uso do preload.js
@@ -89,23 +114,26 @@ api.setName((args) => {
     // "Recortar" o nome da busca e setar no campo do form
     let busca = document.getElementById('searchClient').value
     // Limpar o campo de busca 
-    foco.value=""
+    foco.value = ""
     // Foco no campo nome
     nameClient.focus()
     // Copiar o nome do cliente para o campo nome
     nameClient.value = busca
+    // Restaurar tecla enter
+    restaurarEnter()
 })
 
 api.setCpf((args) => {
     console.log("Teste do IPC 'set-cpf'")
     // "Recortar" o nome da busca e setar no campo do form
-    let buscacpf = document.getElementById('inputCPFClien').value
+    let buscacpf = document.getElementById('inputCPFClient').value
+    //const isCpf = /^\d{11}$/.test(busca);
     let busca = document.getElementById('searchClient').value
 
     if (buscacpf && busca) {
-        buscacpf.value = inputCPFClien;
+        cpfClient.value = buscacpf;
         busca.value = '';
-        buscacpg.focus();
+        cpfClient.focus();
     }
     // Limpar o campo de busca 
     //foco.value=""
@@ -127,33 +155,35 @@ function searchName() {
         //precisa usar o preload.js
         api.validateSearch()
     } else {
-         // Envair o nome do clinte ao main (passo 2)
-    api.searchName(cliName)
-    // Receber os dados do cliente (passo 5)
-    api.renderClient((event, client) => {
-        // Teste de recebimento dos dados do cliente
-        console.log(client)
-        // Passo 6 renderização dos dados do cliente (preencher os inputs do form) - Não esquecer de converter os dados de string para JSON
-        const clientData = JSON.parse(client)
-        arrayClient = clientData
+        // Envair o nome do clinte ao main (passo 2)
+        api.searchName(cliName)
+        // Receber os dados do cliente (passo 5)
+        api.renderClient((event, client) => {
+            // Teste de recebimento dos dados do cliente
+            console.log(client)
+            // Passo 6 renderização dos dados do cliente (preencher os inputs do form) - Não esquecer de converter os dados de string para JSON
+            const clientData = JSON.parse(client)
+            arrayClient = clientData
 
-        // Uso do forEach para percorrer o vetor e extrair os dados
-        arrayClient.forEach((c) => {
-            nameClient.value = c.nomeCliente
-            cpfClient.value = c.cpfCliente
-            emailClient.value = c.emailCliente
-            phoneClient.value = c.foneCliente
-            cepClient.value = c.cepCliente
-            addressClient.value = c.logradouroCliente
-            numberClient.value = c.numeroCliente
-            complementClient.value = c.complementoCliente
-            neighborhoodClient.value = c.bairroCliente
-            cityClient.value = c.cidadeCliente
-            ufClient.value = c.ufCliente
+            // Uso do forEach para percorrer o vetor e extrair os dados
+            arrayClient.forEach((c) => {
+                nameClient.value = c.nomeCliente
+                cpfClient.value = c.cpfCliente
+                emailClient.value = c.emailCliente
+                phoneClient.value = c.foneCliente
+                cepClient.value = c.cepCliente
+                addressClient.value = c.logradouroCliente
+                numberClient.value = c.numeroCliente
+                complementClient.value = c.complementoCliente
+                neighborhoodClient.value = c.bairroCliente
+                cityClient.value = c.cidadeCliente
+                ufClient.value = c.ufCliente
+                // Restaurar a tecla Enter
+                restaurarEnter()
+            })
         })
-    })
     }
-   
+
 
 }
 

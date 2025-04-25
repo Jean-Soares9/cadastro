@@ -376,7 +376,7 @@ ipcMain.on('validate-search', () => {
 })
 
 ipcMain.on('search-name', async (event, cliName) => {
-    // Tesye de recebimento do nome do cliente (passo 2)
+    // Teste de recebimento do nome do cliente (passo 2)
     console.log(cliName)
     try {
 
@@ -408,7 +408,7 @@ ipcMain.on('search-name', async (event, cliName) => {
                 defaultId: 0,
                 buttons: ['Sim', 'Não'] //[0, 1] defaultId: 0 = Sim
             }).then((result) => {
-                // Seo botão Sim for pressionado
+                // Se o botão Sim for pressionado
                 if (result.response === 0) {
                     // Envir ao rendererCliente um pedido para recortar e copiar o nome do cliente do campo de busca para o campo nome (evitar que o usuário digite o nome novamente)
                     event.reply('set-name')                    
@@ -417,7 +417,7 @@ ipcMain.on('search-name', async (event, cliName) => {
                 event.reply('reset-form')  
                 }
 
-                // Seo botão Sim for pressionado
+                // Se o botão Sim for pressionado
                 if (result.response === 0) {
                     // Envir ao rendererCliente um pedido para recortar e copiar o cpf do cliente do campo de busca para o campo cpf (evitar que o usuário digite o cpf novamente)
                     event.reply('set-cpf')                    
