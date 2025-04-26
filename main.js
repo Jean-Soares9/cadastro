@@ -125,7 +125,7 @@ ipcMain.on('db-connect', async (event) => {
     if (conectado) {
         // enviar uma mensagem para o renderizador trocar o ícone, criar um delay de 0.5s para sincronizar a nuvem
         setTimeout(() => {
-            event.reply('db-status', "conectado")
+            event.reply('db-status', "conectar")
         }, 500) //500ms        
     }
 })
@@ -408,23 +408,35 @@ ipcMain.on('search-name', async (event, cliName) => {
                 defaultId: 0,
                 buttons: ['Sim', 'Não'] //[0, 1] defaultId: 0 = Sim
             }).then((result) => {
-                // Se o botão Sim for pressionado
+
                 if (result.response === 0) {
-                    // Envir ao rendererCliente um pedido para recortar e copiar o nome do cliente do campo de busca para o campo nome (evitar que o usuário digite o nome novamente)
-                    event.reply('set-name')                    
-                } else {
-                  // Enviar ao rendererCliente.js um pedido para limpar os campos (reutilizar a api do preload 'reset-form')
-                event.reply('reset-form')  
+                    const isCpf = /^\d{11}$/.test(cliName.replace(/\D/g, ''));
+                
+                    if (isCpf) {
+                        event.reply('set-cpf');
+                    } else {
+                        event.reply('set-name');
+                    }
                 }
+                
 
                 // Se o botão Sim for pressionado
-                if (result.response === 0) {
-                    // Envir ao rendererCliente um pedido para recortar e copiar o cpf do cliente do campo de busca para o campo cpf (evitar que o usuário digite o cpf novamente)
-                    event.reply('set-cpf')                    
-                } else {
+                //if (result.response === 0) {
+                    // Envir ao rendererCliente um pedido para recortar e copiar o nome do cliente do campo de busca para o campo nome (evitar que o usuário digite o nome novamente)
+                    //event.reply('set-name')                    
+                //} else {
                   // Enviar ao rendererCliente.js um pedido para limpar os campos (reutilizar a api do preload 'reset-form')
-                event.reply('reset-form')  
-                }
+                //event.reply('reset-form')  
+                //}
+
+                // Se o botão Sim for pressionado
+                //if (result.response === 0) {
+                    // Envir ao rendererCliente um pedido para recortar e copiar o cpf do cliente do campo de busca para o campo cpf (evitar que o usuário digite o cpf novamente)
+                    //event.reply('set-cpf')                    
+                //} else {
+                  // Enviar ao rendererCliente.js um pedido para limpar os campos (reutilizar a api do preload 'reset-form')
+                //event.reply('reset-form')  
+                //}
             })
         } else {
             // Enviar ao renderizador (renderClient) os dados do cliente (passo 5) OBS: Não esquecer de converter para string

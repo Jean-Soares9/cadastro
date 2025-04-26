@@ -28,9 +28,11 @@ let arrayClient = []
 
 // Iniciar a janela de clientes alterando as propriedades de alguns elementos
 document.addEventListener('DOMContentLoaded', () => {
-    // Desativar os botões
+    // Desativar os botões editar e excluir
     btnUpdate.disabled = true
     btnDelete.disabled = true
+    // Ativar o botão adicionar
+    btnCreate.disabled = false
     // Foco na busca do cliente
     foco.focus()
 })
@@ -125,23 +127,33 @@ api.setName((args) => {
 
 api.setCpf((args) => {
     console.log("Teste do IPC 'set-cpf'")
-    // "Recortar" o nome da busca e setar no campo do form
-    let buscacpf = document.getElementById('inputCPFClient').value
-    //const isCpf = /^\d{11}$/.test(busca);
     let busca = document.getElementById('searchClient').value
+    foco.value = ""
+    cpfClient.focus()
+    cpfClient.value = busca.replace(/\D/g, "") // Limpa pontuação se vier com
+    restaurarEnter()
+})
 
-    if (buscacpf && busca) {
-        cpfClient.value = buscacpf;
-        busca.value = '';
-        cpfClient.focus();
-    }
+
+//api.setCpf((args) => {
+  //  console.log("Teste do IPC 'set-cpf'")
+    // "Recortar" o nome da busca e setar no campo do form
+    //let buscacpf = document.getElementById('inputCPFClient').value
+    //const isCpf = /^\d{11}$/.test(busca);
+    //let busca = document.getElementById('searchClient').value
+
+    //if (buscacpf && busca) {
+      //  cpfClient.value = buscacpf;
+      //  busca.value = '';
+      //  cpfClient.focus();
+    //}
     // Limpar o campo de busca 
     //foco.value=""
     // Foco no campo cpf
     //cpfClient.focus()
     // Copiar o nome do cliente para o campo nome
     //cpfClient.value = buscacpf
-})
+//})
 
 function searchName() {
     // console.log("Teste do botão buscar")
@@ -180,6 +192,11 @@ function searchName() {
                 ufClient.value = c.ufCliente
                 // Restaurar a tecla Enter
                 restaurarEnter()
+                // Desativar o botão adicionar
+                btnCreate.disabled = true
+                // ativar os botões editar e excluir
+                btnUpdate.disabled = false
+                btnDelete.disabled = false
             })
         })
     }
