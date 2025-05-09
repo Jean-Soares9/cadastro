@@ -50,11 +50,12 @@ let complementClient = document.getElementById('inputComplementClient')
 let neighborhoodClient = document.getElementById('inputNeighborhoodClient')
 let cityClient = document.getElementById('inputCityClient')
 let ufClient = document.getElementById('inputUFClient')
-
-
+// Uso do ID para o delete e update
+let idClient = document.getElementById('inputIdClient')
 
 // ================================================================
 // == Manipulação do Enter ========================================
+
 function teclaEnter(event) {
     if (event.key === "Enter") {
         event.preventDefault() // ignorar o comportamento padrão
@@ -72,8 +73,9 @@ function restaurarEnter() {
 }
 
 
-// ================================================================
-// ================================================================
+// == Fim - Manipulação do Enter ==============================
+// ============================================================
+
 
 // ============================================================
 // == CRUD Create/Update ======================================
@@ -83,26 +85,53 @@ frmClient.addEventListener('submit', async (event) => {
     //evitar o comportamento padrão do submit que é enviar os dados do formulário e reiniciar o documento html
     event.preventDefault()
     // Teste importante (recebimento dos dados do formuláro - passo 1 do fluxo)
-    console.log(nameClient.value, cpfClient.value, emailClient.value, phoneClient.value, cepClient.value, addressClient.value, numberClient.value, complementClient.value, neighborhoodClient.value, cityClient.value, ufClient.value)
+    //console.log(nameClient.value, cpfClient.value, emailClient.value, phoneClient.value, cepClient.value, addressClient.value, numberClient.value, complementClient.value, neighborhoodClient.value, cityClient.value, ufClient.value)
     //Criar um objeto para armazenar os dados do cliente antes de enviar ao main
-    const client = {
-        nameCli: nameClient.value,
-        cpfCli: cpfClient.value,
-        emailCli: emailClient.value,
-        phoneCli: phoneClient.value,
-        cepCli: cepClient.value,
-        addressCli: addressClient.value,
-        numberCli: numberClient.value,
-        complementCli: complementClient.value,
-        neighborhoodCli: neighborhoodClient.value,
-        cityCli: cityClient.value,
-        ufCli: ufClient.value
 
+    // Estratégia para usar o submit para cadastrar um novo Cliente ou editar os dados de um Cliente ja existe
+    // verificar se existe o id do cliente
+    if (idClient.value === "") {
+        // cadastrar um novo cliente
+        const client = {
+            nameCli: nameClient.value,
+            cpfCli: cpfClient.value,
+            emailCli: emailClient.value,
+            phoneCli: phoneClient.value,
+            cepCli: cepClient.value,
+            addressCli: addressClient.value,
+            numberCli: numberClient.value,
+            complementCli: complementClient.value,
+            neighborhoodCli: neighborhoodClient.value,
+            cityCli: cityClient.value,
+            ufCli: ufClient.value
+        }
+        // Enviar ao main o objeto client - (Passo 2: )
+        // uso do preload.js
+        api.newClient(client)
+    } else {
+        // alterar os dados de um cliente existente
+        // teste de validação do id
+        // console.log(idClient.value)
+        // editar um cliente existente
+        const client = {
+            idCli: idClient.value,
+            nameCli: nameClient.value,
+            cpfCli: cpfClient.value,
+            emailCli: emailClient.value,
+            phoneCli: phoneClient.value,
+            cepCli: cepClient.value,
+            addressCli: addressClient.value,
+            numberCli: numberClient.value,
+            complementCli: complementClient.value,
+            neighborhoodCli: neighborhoodClient.value,
+            cityCli: cityClient.value,
+            ufCli: ufClient.value
+        }
+        // enviar ao main o objeto client - (passo 2: fluxo)
+        // uso preload.js
+        api.updateClient(client)
     }
-    // Enviar ao main o objeto client - (Passo 2: fluxo)
-    // uso do preload.js
-    api.newClient(client)
-})
+});
 
 // == Fim CRUD Create/Update ==================================
 // ============================================================
@@ -134,27 +163,6 @@ api.setCpf((args) => {
     restaurarEnter()
 })
 
-
-//api.setCpf((args) => {
-  //  console.log("Teste do IPC 'set-cpf'")
-    // "Recortar" o nome da busca e setar no campo do form
-    //let buscacpf = document.getElementById('inputCPFClient').value
-    //const isCpf = /^\d{11}$/.test(busca);
-    //let busca = document.getElementById('searchClient').value
-
-    //if (buscacpf && busca) {
-      //  cpfClient.value = buscacpf;
-      //  busca.value = '';
-      //  cpfClient.focus();
-    //}
-    // Limpar o campo de busca 
-    //foco.value=""
-    // Foco no campo cpf
-    //cpfClient.focus()
-    // Copiar o nome do cliente para o campo nome
-    //cpfClient.value = buscacpf
-//})
-
 function searchName() {
     // console.log("Teste do botão buscar")
     // Capturar o nome a ser pesquisado(passo 1)
@@ -179,6 +187,7 @@ function searchName() {
 
             // Uso do forEach para percorrer o vetor e extrair os dados
             arrayClient.forEach((c) => {
+                idClient.value = c._id
                 nameClient.value = c.nomeCliente
                 cpfClient.value = c.cpfCliente
                 emailClient.value = c.emailCliente
@@ -205,6 +214,18 @@ function searchName() {
 }
 
 // == Fim - CRUD READ =========================================
+// ============================================================
+
+// ============================================================
+// == CRUD Delete =============================================
+
+function removeClient() {
+    //console.log(idClient.value) // teste do Passo 1
+    // Passo 2 - Envio do id para o main
+    api.deleteClient(idClient.value)
+}
+
+// == Fim - CRUD Delete =======================================
 // ============================================================
 
 // ============================================================

@@ -247,7 +247,6 @@ ipcMain.on('new-client', async (event, client) => {
             }
         })
     } catch (error) {
-        console.log(error)
         //tratamento de excessão "CPF duplicado"
         if (error.code === 11000) {
             dialog.showMessageBox({
@@ -264,9 +263,7 @@ ipcMain.on('new-client', async (event, client) => {
         } else {
             console.log(error)
         }
-
     }
-
 })
 
 // == Fim - Clientes - CRUD Create
@@ -387,14 +384,12 @@ ipcMain.on('search-name', async (event, cliName) => {
         if (isCpf) {
             client = await clientModel.find({ cpfCliente: cliName });
         } else {
-        // Passos 3 e 4 (busca dos dados do cliente pelo nome)
-        // RegExp (expressão regular 'i' -> insensitive (ignorar letras maiúsculas ou minúsculas))
+            // Passos 3 e 4 (busca dos dados do cliente pelo nome)
+            // RegExp (expressão regular 'i' -> insensitive (ignorar letras maiúsculas ou minúsculas))
             client = await clientModel.find({
                 nomeCliente: new RegExp(cliName, 'i')
-            });
+            })
         }
-        
-        
         // teste da busca do cliente pelo nome (passos 3 e 4)
         console.log(client)
         // Melhoria da experiencia do usuário (se não existir um cliente cadastrado, enviar uma mensagem ao usuário questionando se ele deseja cadastrar este novo cliente)
@@ -411,38 +406,19 @@ ipcMain.on('search-name', async (event, cliName) => {
 
                 if (result.response === 0) {
                     const isCpf = /^\d{11}$/.test(cliName.replace(/\D/g, ''));
-                
+
                     if (isCpf) {
                         event.reply('set-cpf');
                     } else {
                         event.reply('set-name');
                     }
                 }
-                
-
-                // Se o botão Sim for pressionado
-                //if (result.response === 0) {
-                    // Envir ao rendererCliente um pedido para recortar e copiar o nome do cliente do campo de busca para o campo nome (evitar que o usuário digite o nome novamente)
-                    //event.reply('set-name')                    
-                //} else {
-                  // Enviar ao rendererCliente.js um pedido para limpar os campos (reutilizar a api do preload 'reset-form')
-                //event.reply('reset-form')  
-                //}
-
-                // Se o botão Sim for pressionado
-                //if (result.response === 0) {
-                    // Envir ao rendererCliente um pedido para recortar e copiar o cpf do cliente do campo de busca para o campo cpf (evitar que o usuário digite o cpf novamente)
-                    //event.reply('set-cpf')                    
-                //} else {
-                  // Enviar ao rendererCliente.js um pedido para limpar os campos (reutilizar a api do preload 'reset-form')
-                //event.reply('reset-form')  
-                //}
             })
         } else {
             // Enviar ao renderizador (renderClient) os dados do cliente (passo 5) OBS: Não esquecer de converter para string
-        event.reply('render-client', JSON.stringify(client))
+            event.reply('render-client', JSON.stringify(client))
         }
-        
+
     } catch (error) {
         console.log(error)
     }
@@ -450,4 +426,90 @@ ipcMain.on('search-name', async (event, cliName) => {
 
 
 // == Fim - CRUD READ =========================================
+// ============================================================
+
+// ============================================================
+// == CRUD Delete =============================================
+
+ipcMain.on('delete-client', async (event, id) => {
+    //console.log(id) //teste do passo 2
+    // confirmação antes de excluir
+    const result = await dialog.showMessageBox(win, {
+        type: 'warning',
+        title: "Atenção!",
+        message: "Tem certeza que deseja excluir este cliente?\nEsta ação não poderá ser desfeita.",
+        buttons: ['Cancelar', 'Excluir']
+    })
+    if (result.response === 1) {
+        try {
+            const delClient = await clientModel.findByIdAndDelete(id)
+            event.reply('reset-form')
+        } catch (error) {
+            console.log(error)
+        }
+    }
+})
+
+// == Fim - Crud delete =======================================
+// ============================================================
+
+// ============================================================
+// == CRUD Update =============================================
+
+ipcMain.on('update-client', async (event, client) => {
+    // Importante! Teste de recebimento dos dados do cliente
+    console.log(client)
+    // Alterar a estrutura de dados no banco de dados MongoDB
+    try {
+        // criar uma nova de estrutura de dados usando a classe modelo. Atenção! Os atributos precisam ser idênticos ao modelo de dados Clientes.js e os valores são definidos pelo conteúdo do objeto cliente
+        const updateClient = await clientModel.findByIdAndUpdate(
+            client.idCli,
+            {
+                nomeCliente: client.nameCli,
+                cpfCliente: client.cpfCli,
+                emailCliente: client.emailCli,
+                foneCliente: client.phoneCli,
+                cepCliente: client.cepCli,
+                logradouroCliente: client.addressCli,
+                numeroCliente: client.numberCli,
+                complementoCliente: client.complementCli,
+                bairroCliente: client.neighborhoodCli,
+                cidadeCliente: client.cityCli,
+                ufCliente: client.ufCli
+            },
+            {
+                new: true
+            }
+        )
+        // mensagem de confirmação
+        dialog.showMessageBox({
+            type: 'info',
+            title: "Aviso",
+            message: "Dados do cliente alterados com sucesso",
+            buttons: ['OK']
+        }).then((result) => {
+            if (result.response === 0) {
+                event.reply('reset-form')
+            }
+        })
+    } catch (error) {
+        //tratamento da excessão "CPF duplicado"
+        if (error.code === 11000) {
+            dialog.showMessageBox({
+                type: 'error',
+                title: "Atenção!",
+                message: "CPF já cadastrado.\nVerifique o número digitado.",
+                buttons: ['OK']
+            }).then((result) => {
+                // se o botão OK for pressionado
+                if (result.response === 0) {
+                    //Limpar o campo CPF, foco e borda em vermelho
+                }
+            })
+        } else {
+            console.log(error)
+        }
+    }
+})
+// == Fim - Crud Update =======================================
 // ============================================================

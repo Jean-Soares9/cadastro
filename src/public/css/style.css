@@ -178,3 +178,8 @@ button:hover {
         padding: 10px 15px;
     }
 }
+
+/* Ocultar o id do cliente */
+#inputIdClient {
+    display: none;
+}
