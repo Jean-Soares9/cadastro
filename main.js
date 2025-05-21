@@ -424,7 +424,18 @@ ipcMain.on('search-name', async (event, cliName) => {
     }
 })
 
+ipcMain.on('check-cpf', async (event, cpf) => {
+    try {
+      const existingClient = await clientModel.findOne({ cpfCliente: cpf })
+      const exists = !!existingClient // true se encontrou, false se não
+      event.reply('cpf-in-use', exists)
+    } catch (error) {
+      console.error('Erro ao verificar CPF:', error)
+      event.reply('cpf-in-use', false) // Retorna false em caso de erro
+    }
+  })
 
+  
 // == Fim - CRUD READ =========================================
 // ============================================================
 

@@ -213,6 +213,74 @@ function searchName() {
 
 }
 
+// Função para validar CPF
+function isValidCPF(cpf) {
+    cpf = cpf.replace(/\D/g, '')
+    if (cpf.length !== 11 || /^(\d)\1+$/.test(cpf)) return false
+  
+    let soma = 0, resto
+    for (let i = 1; i <= 9; i++) soma += parseInt(cpf[i - 1]) * (11 - i)
+    resto = (soma * 10) % 11
+    if (resto === 10 || resto === 11) resto = 0
+    if (resto !== parseInt(cpf[9])) return false
+  
+    soma = 0
+    for (let i = 1; i <= 10; i++) soma += parseInt(cpf[i - 1]) * (12 - i)
+    resto = (soma * 10) % 11
+    if (resto === 10 || resto === 11) resto = 0
+  
+    return resto === parseInt(cpf[10])
+  }
+  
+  // Referência ao campo e mensagem de erro
+  const cpfErrorMessage = document.getElementById('cpfErrorMessage')
+  
+  // Evento input (digitação) para validar em tempo real
+  cpfClient.addEventListener('input', () => {
+    const cpf = cpfClient.value.trim().replace(/\D/g, '')
+  
+    if (cpf.length === 11) {
+      if (!isValidCPF(cpf)) {
+        cpfErrorMessage.textContent = 'CPF inválido.'
+        cpfErrorMessage.style.display = 'block'
+        cpfClient.classList.add('border', 'border-danger', 'shadow-sm')
+  
+        setTimeout(() => {
+          cpfClient.value = ''
+          cpfClient.focus()
+          cpfClient.setSelectionRange(0, 0)
+        }, 2000)
+        return
+      }
+  
+      // CPF válido → remove erro e consulta duplicação
+      cpfErrorMessage.style.display = 'none'
+      cpfClient.classList.remove('border', 'border-danger', 'shadow-sm')
+      window.api.checkCpf(cpf)
+    }
+  })
+  
+  // Resposta do backend se o CPF já está em uso
+  window.api.cpfInUse((event, exists) => {
+    if (exists) {
+      cpfErrorMessage.textContent = 'Este CPF já está cadastrado.'
+      cpfErrorMessage.style.display = 'block'
+      cpfClient.classList.add('border', 'border-danger', 'shadow-sm')
+  
+      setTimeout(() => {
+        cpfClient.value = ''
+        cpfClient.focus()
+        cpfClient.setSelectionRange(0, 0)
+      }, 2000)
+    } else {
+      cpfErrorMessage.style.display = 'none'
+      cpfClient.classList.remove('border', 'border-danger', 'shadow-sm')
+    }
+  })
+  
+  
+  
+  
 // == Fim - CRUD READ =========================================
 // ============================================================
 

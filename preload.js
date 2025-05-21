@@ -22,5 +22,8 @@ contextBridge.exposeInMainWorld('api', {
     setName: (args) => ipcRenderer.on('set-name', args),
     setCpf: (args) => ipcRenderer.on('set-cpf', args),
     deleteClient: (id) => ipcRenderer.send('delete-client', id),
-    updateClient: (client) => ipcRenderer.send('update-client', client)
+    updateClient: (client) => ipcRenderer.send('update-client', client),
+    checkCpf: (cpf) => ipcRenderer.send('check-cpf', cpf),
+    cpfInUse: (callback) => ipcRenderer.on('cpf-in-use', callback)
+
 })
