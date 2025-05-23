@@ -245,11 +245,11 @@ function isValidCPF(cpf) {
         cpfErrorMessage.style.display = 'block'
         cpfClient.classList.add('border', 'border-danger', 'shadow-sm')
   
-        setTimeout(() => {
-          cpfClient.value = ''
-          cpfClient.focus()
-          cpfClient.setSelectionRange(0, 0)
-        }, 2000)
+       // setTimeout(() => {
+      //    cpfClient.value = ''
+      //    cpfClient.focus()
+      //    cpfClient.setSelectionRange(0, 0)
+      //  }, 2000)
         return
       }
   
@@ -271,7 +271,7 @@ function isValidCPF(cpf) {
         cpfClient.value = ''
         cpfClient.focus()
         cpfClient.setSelectionRange(0, 0)
-      }, 2000)
+    }, 2000)
     } else {
       cpfErrorMessage.style.display = 'none'
       cpfClient.classList.remove('border', 'border-danger', 'shadow-sm')
@@ -283,6 +283,8 @@ function isValidCPF(cpf) {
   
 // == Fim - CRUD READ =========================================
 // ============================================================
+
+document.getElementById('inputIdClient').style.display = 'none';
 
 // ============================================================
 // == CRUD Delete =============================================
